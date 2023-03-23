@@ -8,7 +8,6 @@ const { registerNewTrader, getTrader } = require('./traderService')
 const initializePassport = require('../passport-config');
 initializePassport(passport,
      email => getTrader(email),
-     id => users.find(user => user.id === id)
 );
 
 
@@ -18,7 +17,11 @@ router.post('/register', async (req, res) => {
         res.status(201).json(newTrader)
     } catch (error) {
         console.error(error)
-        res.status(error?.status || 500).send('could not register user')
+        if (error.message.includes("duplicate")) {
+            res.status(error?.status || 500).send('A user with this email already exists')            
+        } else {
+            res.status(error?.status || 500).send('Could not register new user')
+        }
     }
 })
 

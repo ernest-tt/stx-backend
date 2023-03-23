@@ -3,7 +3,7 @@ const pool = require('./db')
 const registerNewTrader = async (body) => {
     return pool.query(
         "INSERT INTO traders(name, email, password) VALUES($1, $2, $3)", 
-        [body.name, body.email, body.password]
+        [body.fullName, body.email, body.password]
     ).then((res) => {
         return pool.query(
             'SELECT email, name FROM traders where email = $1', [body.email]

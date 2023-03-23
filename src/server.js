@@ -3,6 +3,7 @@ if(process.env.NODE_ENV !== 'production') {
 }
 
 const express = require('express')
+const cookieParser = require("cookie-parser")
 const app = express()
 const passport = require('passport')
 const flash = require('express-flash')
@@ -15,9 +16,11 @@ const accountRouter = require('./accounts/accountRouter')
 
 
 app.use(express.json())
+app.use(cookieParser())
 app.use(flash())
 app.use(session({
     secret: process.env.SESSION_SECRET,
+    cookie: {maxAge: 1000 * 60 * 60 * 24 },
     resave: false,
     saveUninitialized: false
 }))
@@ -60,6 +63,6 @@ function checkNotAuthenticated(req, res, next){
     next()
 }
 
-app.listen(3000, () => {
-    console.log('Listening on port 3000')
+app.listen(5000, () => {
+    console.log('Listening on port 5000')
 })
