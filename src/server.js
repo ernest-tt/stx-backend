@@ -8,7 +8,9 @@ const passport = require('passport')
 const flash = require('express-flash')
 const session = require('express-session')
 const cors = require('cors');
-const userRouter = require('./user/userRouter')
+const traderRouter = require('./trader/traderRouter')
+const providerRouter = require('./providers/providerRouter')
+const purchaseRouter = require('./purchases/purchaseRouter')
 
 
 app.use(express.json())
@@ -24,12 +26,11 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 
-app.use('/user', userRouter)
+app.use('/trader', traderRouter)
 
+app.use('/providers', checkAuthenticated, providerRouter)
 
-app.get('/', checkAuthenticated, (req, res) => {
-    res.send('<h1>Hi</h1>')
-})
+app.use('/purchase', checkAuthenticated, purchaseRouter)
 
 app.delete('/logout', (req, res, next) => {
     req.logout((err) => {
@@ -38,7 +39,7 @@ app.delete('/logout', (req, res, next) => {
     res.status(200).send('logout success')
 })
 
-app.get('*', (req, res) => {
+app.get('*', checkAuthenticated, (req, res) => {
     res.status(404).json("Not found")
 })
 

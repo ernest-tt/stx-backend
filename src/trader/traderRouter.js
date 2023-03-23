@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const passport = require('passport')
-const { registerNewTrader, getTrader } = require('./userService')
+const { registerNewTrader, getTrader } = require('./traderService')
 
 
 
@@ -15,7 +15,7 @@ initializePassport(passport,
 router.post('/register', async (req, res) => {
     try {
         const newTrader = await registerNewTrader(req.body)
-        res.status(201).send("success")
+        res.status(201).json(newTrader)
     } catch (error) {
         console.error(error)
         res.status(error?.status || 500).send('could not register user')
