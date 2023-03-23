@@ -11,6 +11,7 @@ const cors = require('cors');
 const traderRouter = require('./trader/traderRouter')
 const providerRouter = require('./providers/providerRouter')
 const purchaseRouter = require('./purchases/purchaseRouter')
+const accountRouter = require('./accounts/accountRouter')
 
 
 app.use(express.json())
@@ -32,9 +33,11 @@ app.use('/providers', checkAuthenticated, providerRouter)
 
 app.use('/purchase', checkAuthenticated, purchaseRouter)
 
+app.use('/accounts', checkAuthenticated, accountRouter)
+
 app.delete('/logout', (req, res, next) => {
     req.logout((err) => {
-        if (err) {return nex(err)}
+        if (err) {return next(err)}
     })
     res.status(200).send('logout success')
 })

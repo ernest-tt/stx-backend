@@ -1,19 +1,19 @@
 const dbService = require('../dbService')
 
-const getAllProviders = () => {
-    return dbService.getAllProviders()
+const createPurchaseRequest = (body) => {
+    return dbService.createPurchaseRequest(body)
 }
 
-const getAllOffers = () => {
-    return dbService.getAllOffers()
+const getAllRequests = (email) => {
+    return dbService.getAllRequests(email)
 }
 
-const getOffersFromProvider = (providerId) => {
-    return dbService.getOffersFromProvider(providerId)
+const getRequestDetails = (email, requestId) => {
+    return dbService.getRequestDetails(email, requestId)
 }
 
 module.exports = { 
-    getAllProviders,
-    getAllOffers,
-    getOffersFromProvider
+    createPurchaseRequest,
+    getAllRequests,
+    getRequestDetails
 }

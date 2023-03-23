@@ -20,6 +20,9 @@ const getTrader = async (email) => {
     ).then((res) => {
         return res.rows[0]
     })
+    .catch((err) => {
+        throw { status: err?.status || 500, message: err.message }
+    })
 }
 
 const getAllProviders = () => {
@@ -72,11 +75,79 @@ const getOffersFromProvider = (providerId) => {
     })
 }
 
+const getTraderAccounts = (email) => {
+    return pool.query(
+        `SELECT a.account_id, b.bank_name, a.account_number FROM accounts a
+         INNER JOIN traders t 
+         ON t.trader_id  = a.trader_id 
+         INNER JOIN banks b
+         ON b.bank_id = a.bank_id 
+         WHERE t.email = $1`, [email]
+    )
+    .then((res) => {return res.rows})
+    .catch((err) => {
+        throw { status: err?.status || 500, message: err.message }
+    })
+}
+
+const createPurchaseRequest = (body) => {
+    return pool.query(
+        `INSERT INTO requests (trader_id, offer_id, provider_id , amount, account_id)
+         VALUES ($1, $2, $3, $4, $5)`, [body.traderId, body.offerId, body.providerId, body.amount, body.accountId]
+    )
+    .then((res) => {return res.rows})
+    .catch((err) => {
+        throw { status: err?.status || 500, message: err.message }
+    })
+}
+
+const getAllRequests = (email) => {
+    return pool.query(
+        `SELECT r.request_id, r.amount, r.request_date, r.status,
+         c.symbol , p.name
+         FROM requests r 
+         INNER JOIN traders t ON r.trader_id = t.trader_id
+         INNER JOIN offers o ON r.offer_id = o.offer_id
+         INNER JOIN currencies c ON o.currency_id = c.currency_id 
+         INNER JOIN providers p ON r.provider_id = p.provider_id 
+         INNER JOIN accounts a ON r.account_id = a.account_id 
+         INNER JOIN banks b ON a.bank_id = b.bank_id 
+         WHERE email = $1`, [email]
+    )
+    .then((res) => {return res.rows})
+    .catch((err) => {
+        throw { status: err?.status || 500, message: err.message }
+    })
+}
+
+const getRequestDetails = (email, requestId) => {
+    return pool.query(
+        `SELECT r.request_id, r.amount, r.request_date, r.status,
+         o.selling_price , o.buying_price , c.symbol , p.name, b.bank_name 
+         FROM requests r 
+         INNER JOIN traders t ON r.trader_id = t.trader_id
+         INNER JOIN offers o ON r.offer_id = o.offer_id
+         INNER JOIN currencies c ON o.currency_id = c.currency_id 
+         INNER JOIN providers p ON r.provider_id = p.provider_id 
+         INNER JOIN accounts a ON r.account_id = a.account_id 
+         INNER JOIN banks b ON a.bank_id = b.bank_id 
+         WHERE email = $1 AND request_id = $2`, [email, requestId]
+    )
+    .then((res) => {return res.rows[0]})
+    .catch((err) => {
+        throw { status: err?.status || 500, message: err.message }
+    })
+}
+
 
 module.exports = {
     registerNewTrader,
     getTrader,
     getAllProviders,
     getAllOffers,
-    getOffersFromProvider
+    getOffersFromProvider,
+    getTraderAccounts,
+    createPurchaseRequest,
+    getAllRequests,
+    getRequestDetails
 }
