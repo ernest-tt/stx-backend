@@ -99,7 +99,7 @@ const setDefaultBalances = (trader_id) => {
 
 const getTraderBalances = (email) => {
     return pool.query(
-        `SELECT trader_balance_id, c.symbol, amount  from trader_balances tb
+        `SELECT trader_balance_id, c.currency_id, c.symbol, amount  from trader_balances tb
          INNER JOIN currencies c 
          ON tb.currency_id = c.currency_id
          INNER JOIN traders t
@@ -161,7 +161,49 @@ const getRequestDetails = (email, requestId) => {
     })
 }
 
-// const addBankAccount = (bank)
+const addBankAccount = (body) => {
+    return pool.query(
+        `INSERT INTO accounts (trader_id, bank_id , account_number )
+         VALUES($1, $2, $3)`, [body.traderId, body.bankId, body.accountNumber]
+    )
+    .then((res) => {return res.rows[0]})
+    .catch((err) => {
+        throw { status: err?.status || 500, message: err.message }
+    })
+}
+
+const getProviderBalance = (body) => {
+    return pool.query(
+        `SELECT DISTINCT o.currency_id , o.selling_price , pb.amount FROM offers o 
+         INNER JOIN provider_balances pb 
+         ON o.provider_id = pb.provider_id 
+         WHERE o.provider_id = $1 AND o.offer_id = $2;`, [body.providerId, body.offerId]
+    )
+    .then((res) => {return res.rows[0]})
+    .catch((err) => {
+        throw { status: err?.status || 500, message: err.message }
+    })
+}
+
+const updateProviderBalance = (body) => {
+    return pool.query(
+        `update provider_balances 
+        set amount = $1
+        where provider_id = $2 and currency_id = $3`, [body.newBalance, body.providerId, body.currencyId]
+    )
+    .then((res) => {return res.rows[0]})
+    .catch((err) => {
+        throw { status: err?.status || 500, message: err.message }
+    })
+}
+
+const updateTraderBalance = (body) => {
+    return pool.query(
+        `update trader_balances 
+        set amount = $1
+        where trader_balance_id = $2 and currency_id = $3`, [body.newTraderBalance, body.traderBalanceId, body.currencyId]
+    )
+}
 
 module.exports = {
     registerNewTrader,
@@ -170,9 +212,13 @@ module.exports = {
     getAllOffers,
     getOffersFromProvider,
     setDefaultBalances,
+    addBankAccount,
     getTraderAccounts,
     getTraderBalances,
     createPurchaseRequest,
     getAllRequests,
-    getRequestDetails
+    getRequestDetails,
+    getProviderBalance,
+    updateProviderBalance,
+    updateTraderBalance
 }

@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const passport = require('passport')
-const { registerNewTrader, getTrader } = require('./traderService')
+const { registerNewTrader, getTrader, setDefaultBalances } = require('./traderService')
 
 
 
@@ -14,7 +14,8 @@ initializePassport(passport,
 router.post('/register', async (req, res) => {
     try {
         const newTrader = await registerNewTrader(req.body)
-        res.status(201).json(newTrader)
+        const balance = await setDefaultBalances(newTrader.trader_id)
+        res.status(201).json({email: newTrader.email, name: newTrader.name})
     } catch (error) {
         console.error(error)
         if (error.message.includes("duplicate")) {

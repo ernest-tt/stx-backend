@@ -9,6 +9,7 @@ router.post('/create-request', async (req, res) => {
         //get traderId from session
         const traderId = await getTrader(req.session.passport.user)
         req.body.traderId = traderId.trader_id
+        req.body.email = req.session.passport.user
         const purchaseRequest = await createPurchaseRequest(req.body)
         res.status(201).json(purchaseRequest)
     } catch (error) {

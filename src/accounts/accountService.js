@@ -12,9 +12,14 @@ const setDefaultBalances = (trader_id) => {
     return dbService.setDefaultBalances(trader_id)
 }
 
+const addBankAccount = (body) => {
+    return dbService.addBankAccount(body)
+}
+
 
 module.exports = { 
     getTraderAccounts,
     getTraderBalances,
-    setDefaultBalances
+    setDefaultBalances,
+    addBankAccount
 }
