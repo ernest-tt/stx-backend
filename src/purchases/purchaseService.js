@@ -29,7 +29,7 @@ const createPurchaseRequest = async (body) => {
                 })
 
             } else {
-                throw Error('Cannot fulfill request')
+                throw new Error('Cannot fulfill request')
             }
         }
     } catch (err) {

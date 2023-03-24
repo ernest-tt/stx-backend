@@ -11,10 +11,10 @@ router.post('/create-request', async (req, res) => {
         req.body.traderId = traderId.trader_id
         req.body.email = req.session.passport.user
         const purchaseRequest = await createPurchaseRequest(req.body)
-        res.status(201).json(purchaseRequest)
+        res.status(201).json('success')
     } catch (error) {
         console.error(error)
-        res.status(error?.status || 500).send('Could not create purchase request')
+        res.status(error?.status || 500).send(error?.message || 'Could not create purchase request')
     }
 })
 
