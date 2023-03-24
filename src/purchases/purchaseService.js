@@ -16,39 +16,36 @@ const createPurchaseRequest = async (body) => {
                 const request = await dbService.createPurchaseRequest(body);
                 const newBalance = floatProviderBalance - (body.amount / floatSellingRate) 
 
-                setTimeout(() => {
-                    try {
-                        dbService.updateProviderBalance({
-                            newBalance: newBalance.toFixed(2), providerId: body.providerId, 
-                            currencyId: providerBalance.currency_id
+                try {
+                    dbService.updateProviderBalance({
+                        newBalance: newBalance.toFixed(2), providerId: body.providerId, 
+                        currencyId: providerBalance.currency_id
+                    })
+                    .then(() => {
+                        return dbService.updateTraderBalance({
+                            newTraderBalance: floatTraderBalance - body.amount,
+                            traderBalanceId: traderBalance[0].trader_balance_id,
+                            currencyId: traderBalance[0].currency_id
                         })
-                        .then(() => {
-                            return dbService.updateTraderBalance({
-                                newTraderBalance: floatTraderBalance - body.amount,
-                                traderBalanceId: traderBalance[0].trader_balance_id,
-                                currencyId: traderBalance[0].currency_id
-                            })
-                        })
-                        .then(() => {
-                            return dbService.updateRequestStatus({
-                                requestId: request.request_id,
-                                status: 'FULFILLED'
-                            })
-                        })
-                        .then(() => console.log('done'))
-                        .catch((err) => {
-                            console.error(err)
-                        })
-                    } catch (err) {
-                        // set request status to failed
-                        console.error(err)
-                        dbService.updateRequestStatus({
+                    })
+                    .then(() => {
+                        return dbService.updateRequestStatus({
                             requestId: request.request_id,
-                            status: 'FAILED'
-                        }).then(() => {}).catch((err) => console.error(err))
-                    }
-                }, 30000)
-
+                            status: 'FULFILLED'
+                        })
+                    })
+                    .then(() => console.log('done'))
+                    .catch((err) => {
+                        console.error(err)
+                    })
+                } catch (err) {
+                    // set request status to failed
+                    console.error(err)
+                    dbService.updateRequestStatus({
+                        requestId: request.request_id,
+                        status: 'FAILED'
+                    }).then(() => {}).catch((err) => console.error(err))
+                }
                 console.log(request)
             } else {
                 throw new Error('Cannot fulfill request')
