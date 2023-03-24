@@ -10,24 +10,46 @@ const createPurchaseRequest = async (body) => {
             const providerBalance = await dbService.getProviderBalance(body)
             const floatProviderBalance = parseFloat(providerBalance.amount.slice(1).replaceAll(',',''))
             const floatSellingRate = parseFloat(providerBalance.selling_price.slice(1).replaceAll(',',''))
-            console.log(floatSellingRate)
 
             //check provider balance
             if ( floatProviderBalance >= (body.amount / floatSellingRate)) {
                 const request = await dbService.createPurchaseRequest(body);
                 const newBalance = floatProviderBalance - (body.amount / floatSellingRate) 
-                const update = await dbService.updateProviderBalance({
-                    newBalance: newBalance.toFixed(2), providerId: body.providerId, 
-                    currencyId: providerBalance.currency_id
-                })
-                
-                
-                return dbService.updateTraderBalance({
-                    newTraderBalance: floatTraderBalance - body.amount,
-                    traderBalanceId: traderBalance[0].trader_balance_id,
-                    currencyId: traderBalance[0].currency_id
-                })
 
+                setTimeout(() => {
+                    try {
+                        dbService.updateProviderBalance({
+                            newBalance: newBalance.toFixed(2), providerId: body.providerId, 
+                            currencyId: providerBalance.currency_id
+                        })
+                        .then(() => {
+                            return dbService.updateTraderBalance({
+                                newTraderBalance: floatTraderBalance - body.amount,
+                                traderBalanceId: traderBalance[0].trader_balance_id,
+                                currencyId: traderBalance[0].currency_id
+                            })
+                        })
+                        .then(() => {
+                            return dbService.updateRequestStatus({
+                                requestId: request.request_id,
+                                status: 'FULFILLED'
+                            })
+                        })
+                        .then(() => console.log('done'))
+                        .catch((err) => {
+                            console.error(err)
+                        })
+                    } catch (err) {
+                        // set request status to failed
+                        console.error(err)
+                        dbService.updateRequestStatus({
+                            requestId: request.request_id,
+                            status: 'FAILED'
+                        }).then(() => {}).catch((err) => console.error(err))
+                    }
+                }, 30000)
+
+                console.log(request)
             } else {
                 throw new Error('Cannot fulfill request')
             }

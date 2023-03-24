@@ -117,7 +117,15 @@ const createPurchaseRequest = (body) => {
         `INSERT INTO requests (trader_id, offer_id, provider_id , amount, account_id)
          VALUES ($1, $2, $3, $4, $5)`, [body.traderId, body.offerId, body.providerId, body.amount, body.accountId]
     )
-    .then((res) => {return res.rows})
+    .then((res) => {
+        return pool.query(
+            `SELECT request_id FROM requests
+             WHERE trader_id = $1
+             ORDER BY request_date ASC
+             LIMIT 1`, [body.traderId]
+        )
+    })
+    .then((res) => {return res.rows[0]})
     .catch((err) => {
         throw { status: err?.status || 500, message: err.message }
     })
@@ -203,6 +211,22 @@ const updateTraderBalance = (body) => {
         set amount = $1
         where trader_balance_id = $2 and currency_id = $3`, [body.newTraderBalance, body.traderBalanceId, body.currencyId]
     )
+    .then((res) => {return res.rows[0]})
+    .catch((err) => {
+        throw { status: err?.status || 500, message: err.message }
+    })
+}
+
+const updateRequestStatus = (body) => {
+    return pool.query(
+        `UPDATE requests 
+         SET status = $1
+         WHERE request_id = $2`, [body.status, body.requestId]
+    )
+    .then((res) => {return res.rows[0]})
+    .catch((err) => {
+        throw { status: err?.status || 500, message: err.message }
+    })
 }
 
 module.exports = {
@@ -220,5 +244,6 @@ module.exports = {
     getRequestDetails,
     getProviderBalance,
     updateProviderBalance,
-    updateTraderBalance
+    updateTraderBalance,
+    updateRequestStatus
 }
