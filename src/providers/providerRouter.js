@@ -8,7 +8,7 @@ const { getAllProviders, getOffersFromProvider,
 router.get('/all', async (req, res) => {
     try {
         const providers = await getAllProviders()
-        res.status(201).json(providers)
+        res.status(200).json(providers)
     } catch (error) {
         console.error(error)
         res.status(error?.status || 500).send('Could not get providers')
@@ -18,7 +18,7 @@ router.get('/all', async (req, res) => {
 router.get('/offers', async (req, res) => {
     try {
         const offers = await getAllOffers()
-        res.status(201).json(offers)
+        res.status(200).json(offers)
     } catch (error) {
         console.error(error)
         res.status(error?.status || 500).send('Could not get offers')
@@ -28,7 +28,7 @@ router.get('/offers', async (req, res) => {
 router.get('/offers/:id', async (req, res) => {
     try {
         const offers = await getOffersFromProvider(req.params.id)
-        res.status(201).json(offers)
+        res.status(200).json(offers)
     } catch (error) {
         console.error(error)
         res.status(error?.status || 500).send('Could not get provider offers')

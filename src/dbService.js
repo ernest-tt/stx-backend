@@ -6,7 +6,7 @@ const registerNewTrader = async (body) => {
         [body.fullName, body.email, body.password]
     ).then((res) => {
         return pool.query(
-            'SELECT email, name FROM traders where email = $1', [body.email]
+            'SELECT trader_id, email, name FROM traders where email = $1', [body.email]
         ).then((res) => {return res.rows[0]})
     })
     .catch(err => {
@@ -90,6 +90,28 @@ const getTraderAccounts = (email) => {
     })
 }
 
+const setDefaultBalances = (trader_id) => {
+    return pool.query(
+        `insert into trader_balances (trader_id, currency_id, amount)
+         values($1, 1, 20000)`, [trader_id]
+    )
+}
+
+const getTraderBalances = (email) => {
+    return pool.query(
+        `SELECT trader_balance_id, c.symbol, amount  from trader_balances tb
+         INNER JOIN currencies c 
+         ON tb.currency_id = c.currency_id
+         INNER JOIN traders t
+         ON tb.trader_id = t.trader_id 
+         WHERE t.email = $1`, [email]
+    )
+    .then((res) => {return res.rows})
+    .catch((err) => {
+        throw { status: err?.status || 500, message: err.message }
+    })
+}
+
 const createPurchaseRequest = (body) => {
     return pool.query(
         `INSERT INTO requests (trader_id, offer_id, provider_id , amount, account_id)
@@ -139,6 +161,7 @@ const getRequestDetails = (email, requestId) => {
     })
 }
 
+// const addBankAccount = (bank)
 
 module.exports = {
     registerNewTrader,
@@ -146,7 +169,9 @@ module.exports = {
     getAllProviders,
     getAllOffers,
     getOffersFromProvider,
+    setDefaultBalances,
     getTraderAccounts,
+    getTraderBalances,
     createPurchaseRequest,
     getAllRequests,
     getRequestDetails

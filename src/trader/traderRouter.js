@@ -29,9 +29,9 @@ router.post('/login',
     passport.authenticate('local', {
         failureMessage: true,
         failureFlash: true
-    }),
+    }), 
     (req, res) => {
-        res.status(200).json('success')
+        res.send('ok')
     }
 )
 
