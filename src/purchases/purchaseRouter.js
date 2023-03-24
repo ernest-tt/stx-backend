@@ -6,12 +6,14 @@ const { getTrader } = require('../trader/traderService')
 
 router.post('/create-request', async (req, res) => {
     try {
+        console.log(req.body)
         //get traderId from session
         const traderId = await getTrader(req.session.passport.user)
         req.body.traderId = traderId.trader_id
         req.body.email = req.session.passport.user
         const purchaseRequest = await createPurchaseRequest(req.body)
-        res.status(201).json(purchaseRequest)
+        console.log('placed')
+        res.status(201).json("success")
     } catch (error) {
         console.error(error)
         res.status(error?.status || 500).send(error?.message || 'Could not create purchase request')
@@ -21,11 +23,7 @@ router.post('/create-request', async (req, res) => {
 router.get('/all', async (req, res) => {
     try {
         const allRequests = await getAllRequests(req.session.passport.user)
-        if (allRequests.length != 0) {
-            res.status(200).send(allRequests)
-        } else {
-            res.status(404).json('No requests found')
-        }
+        res.status(200).json(allRequests )
     } catch (error) {
         console.error(error)
         res.status(error?.status || 500).send('Could not fetch requests')

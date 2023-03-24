@@ -133,7 +133,7 @@ const createPurchaseRequest = (body) => {
 
 const getAllRequests = (email) => {
     return pool.query(
-        `SELECT r.request_id, r.amount, r.request_date, r.status,
+        `SELECT r.request_id, b.bank_name, r.amount, r.request_date, r.status,
          c.symbol , p.name
          FROM requests r 
          INNER JOIN traders t ON r.trader_id = t.trader_id
@@ -229,6 +229,16 @@ const updateRequestStatus = (body) => {
     })
 }
 
+const getAllBanks = () => {
+    return pool.query(
+        `SELECT * FROM banks`
+    )
+    .then((res) => { return res.rows })
+    .catch((err) => {
+        throw { status: err?.status || 500, message: err.message }
+    })
+}
+
 module.exports = {
     registerNewTrader,
     getTrader,
@@ -245,5 +255,6 @@ module.exports = {
     getProviderBalance,
     updateProviderBalance,
     updateTraderBalance,
-    updateRequestStatus
+    updateRequestStatus,
+    getAllBanks
 }

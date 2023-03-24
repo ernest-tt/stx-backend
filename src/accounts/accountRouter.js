@@ -1,26 +1,37 @@
 const express = require('express')
 const router = express.Router()
-const { getTraderAccounts, getTraderBalances, addBankAccount } = require('./accountService')
+const { getTraderAccounts, getTraderBalances,
+     addBankAccount, getAllBanks } = require('./accountService')
 const {getTrader} = require('../trader/traderService')
 
 
 router.get('/banks', async (req, res) => {
     try {
         const accounts = await getTraderAccounts(req.session.passport.user)
-        res.status(201).json(accounts)
+        res.status(200).json(accounts)
     } catch (error) {
         console.error(error)
         res.status(error?.status || 500).send('Could not get providers')
     }
 })
 
+router.get('/all-banks', async (req, res) => {
+    try {
+        const accounts = await getAllBanks()
+        res.status(200).json(accounts)
+    } catch (error) {
+        console.error(error)
+        res.status(error?.status || 500).send('Could not get banks')
+    }   
+})
+
 router.get('/platform-balances', async ( req, res) => {
     try {
         const balances = await getTraderBalances(req.session.passport.user)
-        res.status(201).json(balances)
+        res.status(200).json(balances)
     } catch (error) {
         console.error(error)
-        res.status(error?.status || 500).send('Could not get providers')
+        res.status(error?.status || 500).send('Could not get balances')
     }    
 })
 

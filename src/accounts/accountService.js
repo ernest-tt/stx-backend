@@ -16,10 +16,15 @@ const addBankAccount = (body) => {
     return dbService.addBankAccount(body)
 }
 
+const getAllBanks = () => {
+    return dbService.getAllBanks()
+}
+
 
 module.exports = { 
     getTraderAccounts,
     getTraderBalances,
     setDefaultBalances,
-    addBankAccount
+    addBankAccount,
+    getAllBanks
 }
