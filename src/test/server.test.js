@@ -132,8 +132,40 @@ describe("Routers Test", () => {
                 })            
         })
 
-        it("should add a bank account", () => {
-            
+        xit("should add a bank account", () => {
+            agent.post('/accounts/add')
+                .send({bankId: 2, accountNumber: 1234567})
+                .then((res) => {
+                    res.should.have.status(201)
+                    res.body.should.be.a('string')
+                })         
+        })
+
+        it("should not allow duplicate bank accounts", () => {
+            agent.post('/accounts/add')
+                .send({bankId: 2, accountNumber: 1234567})
+                .then((res) => {
+                    res.should.have.status(400)
+                    res.body.should.be.a('string')
+                })               
+        })
+    })
+
+    describe("provider router", () => {
+        it("should get all providers", () => {
+            agent.get('/providers/all')
+                .then((res) => {
+                    res.should.have.status(200)
+                    res.body.should.be.a('array')
+                })
+        })
+
+        it("should get all provider offers", () => {
+            agent.get('/providers/offers')
+                .then((res) => {
+                    res.should.have.status(200)
+                    res.body.should.be.a('array')
+                })
         })
     })
 })
