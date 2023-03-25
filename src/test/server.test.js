@@ -20,6 +20,11 @@ describe("Routers Test", () => {
         });
     })
 
+    after((done) => {
+        agent.close()
+        done()
+    })
+
     xdescribe("trader router", () => {
         it("should register user", (done) => {
             let body = {
@@ -168,4 +173,5 @@ describe("Routers Test", () => {
                 })
         })
     })
+
 })
