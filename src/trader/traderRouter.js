@@ -32,7 +32,7 @@ router.post('/login',
         failureFlash: true
     }), 
     (req, res) => {
-        res.send('ok')
+        res.send('success')
     }
 )
 
