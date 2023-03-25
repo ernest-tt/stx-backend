@@ -20,11 +20,16 @@ const getAllBanks = () => {
     return dbService.getAllBanks()
 }
 
+const checkTraderAccountDuplicate = (body) => {
+    return dbService.getOneTraderAccount(body)
+}
+
 
 module.exports = { 
     getTraderAccounts,
     getTraderBalances,
     setDefaultBalances,
     addBankAccount,
-    getAllBanks
+    getAllBanks,
+    checkTraderAccountDuplicate
 }

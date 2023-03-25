@@ -239,6 +239,18 @@ const getAllBanks = () => {
     })
 }
 
+const getOneTraderAccount = (body) => {
+    return pool.query(
+        `SELECT * FROM accounts
+        WHERE bank_id = $1
+        AND account_number = $2`, [body.bankId, body.accountNumber]
+    )
+    .then((res) => { return res.rows[0] })
+    .catch((err) => {
+        throw { status: err?.status || 500, message: err.message }
+    })
+}
+
 module.exports = {
     registerNewTrader,
     getTrader,
@@ -256,5 +268,6 @@ module.exports = {
     updateProviderBalance,
     updateTraderBalance,
     updateRequestStatus,
-    getAllBanks
+    getAllBanks,
+    getOneTraderAccount
 }

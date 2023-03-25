@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const { getTraderAccounts, getTraderBalances,
-     addBankAccount, getAllBanks } = require('./accountService')
+     addBankAccount, getAllBanks, checkTraderAccountDuplicate } = require('./accountService')
 const {getTrader} = require('../trader/traderService')
 
 
@@ -38,9 +38,14 @@ router.get('/platform-balances', async ( req, res) => {
 router.post('/add', async (req, res) => {
     try {
         const trader = await getTrader(req.session.passport.user)
-        req.body.traderId = trader.trader_id
-        const balances = await addBankAccount(req.body)
-        res.status(201).json("success")
+        const existingAccount = await checkTraderAccountDuplicate(req.body)
+        if (existingAccount) {
+            res.status(400).json("Account already exists")
+        } else {
+            req.body.traderId = trader.trader_id
+            const balances = await addBankAccount(req.body)
+            res.status(201).json("success")
+        }
     } catch (error) {
         console.error(error)
         res.status(error?.status || 500).send('Could not get providers')

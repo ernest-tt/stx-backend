@@ -108,6 +108,32 @@ describe("Routers Test", () => {
     })
 
     describe("account router", () => {
-        
+        it("should get all user bank accounts", () => {
+            agent.get('/accounts/banks')
+                .then((res) => {
+                    res.should.have.status(200)
+                    res.body.should.be.a('array')
+                })
+        })
+
+        it("should get all banks", () => {
+            agent.get('/accounts/banks')
+                .then((res) => {
+                    res.should.have.status(200)
+                    res.body.should.be.a('array')
+                })
+        })
+
+        it("should get user platform balance", () => {
+            agent.get('/accounts/banks')
+                .then((res) => {
+                    res.should.have.status(200)
+                    res.body.should.be.a('array')
+                })            
+        })
+
+        it("should add a bank account", () => {
+            
+        })
     })
 })
